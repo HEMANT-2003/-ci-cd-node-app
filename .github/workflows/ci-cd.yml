@@ -21,5 +21,15 @@ jobs:
       - name: Run tests
         run: echo "Tests passed!"
 
-      - name: Deploy (Optional)
-        run: echo "Deploying application..."
+      - name: Deploy to AWS EC2
+        uses: appleboy/ssh-action@v0.1.1
+        with:
+          host: ${{ secrets.EC2_IP_ADDRESS }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/ci-cd-node-app || git clone https://github.com/HEMANT-2003/-ci-cd-node-app.git
+            cd ci-cd-node-app
+            git pull
+            npm install
+            pm2 restart server.js || pm2 start server.js
